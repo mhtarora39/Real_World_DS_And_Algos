@@ -85,6 +85,8 @@ public:
   }
 };
 
+#include "Graph.hpp"
+
 int main()
 {
   std::string eque("1+2-3-(12-3)");
