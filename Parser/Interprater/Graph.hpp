@@ -3,6 +3,9 @@
 #include <memory>
 #include <atomic>
 
+template <typename T>
+class Graph;
+
 int GetID()
 {
   static std::atomic<int> id(0);
@@ -23,14 +26,43 @@ public:
 
   virtual T &compute(const Graph<T> &lhs, const Graph<T> &rhs) = 0;
 };
+template <typename T>
+class NoOp : Ikernal<T>
+{
+public:
+  NoOp()
+  {
+  }
+  ~NoOp()
+  {
+  }
+
+  const Graph<T> &compute(const Graph<T> &lhs, const Graph<T> &rhs)
+  {
+    Graph<T> dummy(lhs);
+    return dummy;
+  }
+};
 
 template <typename T>
 
 class EdgeInfo
 {
-  EdgeInfo(Graph<T> &eg, const int &wt, std::shared_ptr<Ikernal<T>> &krnal) : mEdges(&eg),
-                                                                              mWeight(wt),
-                                                                              mObj(kernal)
+public:
+  EdgeInfo(Graph<T> &eg, const int &wt, std::shared_ptr<Ikernal<T>> &kernal) : mEdge(&eg),
+                                                                               mWeight(wt),
+                                                                               mObj(kernal)
+  {
+  }
+
+  Graph<T> &GetInfo()
+  {
+    return *mEdge;
+  }
+
+  EdgeInfo(EdgeInfo &copy) : mWeight(copy.mWeight),
+                             mObj(copy.mObj),
+                             mEdge(copy.mEdge)
   {
   }
 
@@ -58,6 +90,7 @@ public:
     //Creating Deep Copy
     for (auto &item : other.mEdges)
     {
+      // ToDo safe copy...
       mEdges.push_back(item);
     }
   }
@@ -66,8 +99,22 @@ public:
   {
   }
 
-  void AddEdge(const Graph &edge, int weight, std::shared_ptr<Ikernal<T>> kernal)
+  void DFSTest(const Graph &from)
   {
+    if (from.mEdges.size() > 0)
+    {
+
+      for (auto item : mEdges)
+      {
+        std::cout << "Data : " << item.GetInfo().mData << std::endl;
+        DFSTest(item.GetInfo());
+      }
+    }
+  }
+
+  void AddEdge(Graph &edge, int weight = 1, std::shared_ptr<Ikernal<T>> kernal = std::make_shared<Ikernal<T>>(new NoOp<T>()))
+  {
+    mEdges.push_back(EdgeInfo<T>(edge, weight, kernal));
   }
 
 private:

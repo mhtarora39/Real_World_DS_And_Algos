@@ -3,6 +3,8 @@
 #include <string>
 #include <sstream>
 #include <cctype>
+#include <map>
+#include <algorithm>
 
 class Token
 {
@@ -87,6 +89,62 @@ public:
 
 #include "Graph.hpp"
 
+int CalculateBadTrip(int p, int q, int r)
+{
+  int count = 0;
+
+  //if (p == q || q == r || p == r)
+
+  auto sum = p + q + r;
+  if (sum % p == 0 && sum % q != 0 && sum % r != 0 ||
+      sum % p != 0 && sum % q == 0 && sum % r != 0 ||
+      sum % p != 0 && sum % q != 0 && sum % r == 0)
+  {
+    return 1;
+  }
+  // if (sum % p == 0 && sum % q == 0 && sum % r == 0)
+  // {
+  //   return 1;
+  // }
+  // else if (sum % p == 0 && sum % q == 0 ||
+  //          sum % q == 0 && sum % r == 0 ||
+  //          sum % p == 0 && sum % r == 0)
+  // {
+
+  //   if (p == q || q == r || p == r)
+  //   {
+  //     return 1;
+  //   }
+  // }
+  return 0;
+}
+
+int FindThree(std::vector<int> &Combi)
+{
+  std::map<int, bool> mapUnique;
+  int count = 0;
+  std::vector<std::vector<int>> triplet;
+  std::vector<bool> v(Combi.size());
+  std::vector<int> tmp;
+  std::fill(v.end() - 3, v.end(), true);
+  do
+  {
+    for (int i = 0; i < Combi.size(); i++)
+    {
+      if (v[i])
+        tmp.push_back(Combi[i]);
+        }
+    std::cout << tmp[0] << "," << tmp[1] << "," << tmp[2] << std::endl;
+    std::cout << tmp[0] + tmp[1] + tmp[2] << "\n";
+
+    count += CalculateBadTrip(tmp[0], tmp[1], tmp[2]);
+    tmp.clear();
+
+  } while (std::next_permutation(Combi.begin(), Combi.end()));
+
+  return count;
+}
+
 int main()
 {
   std::string eque("1+2-3-(12-3)");
@@ -94,10 +152,41 @@ int main()
   auto tokens = par.lex();
   for (auto item : tokens)
   {
-    std::cout << item.text << " ";
+    std::cout << item.text << " "; //<< std::endl;
+    ;
   }
+  std::cout << "\n";
+  std::vector<int> num{1, 2, 3, 1};
+  std::cout << "Sum : " << FindThree(num) << std::endl;
 
-  std::cout << std::endl;
+  std::vector<bool> v(4);
+  std::fill(v.end() - 3, v.end(), true);
+  // int c = 0;
+  // do
+  // {
+  //   for (int i = 0; i < 4; i++)
+  //   {
+  //     if (v[i])
+  //       std::cout << " " << num[i] << " ";
+  //   }
+  //   c++;
+  //   std::cout << std::endl;
 
-  return 0;
+  // } while (std::next_permutation(num.begin(), num.end()));
+  // std::cout << c << std::endl;
+  // std::cout << "-----------" << std::endl;
+  // Graph<int> a(1);
+  // Graph<int> b(2);
+  // Graph<int> c(3);
+  // Graph<int> d(4);
+  // a.AddEdge(b);
+  // b.AddEdge(c);
+  // c.AddEdge(d);
+  // b.AddEdge(d);
+
+  // c.DFSTest(a);
+
+  // std::cout << std::endl;
+
+  // return 0;
 }
