@@ -21,8 +21,14 @@ private:
   Dtype all;
   std::vector<std::shared_ptr<Tree<T>>> edge;
 
-  void BuildTreeHelper(Tree<T> &root, int size, std::vector<Tree<T>> &unused, std::vector<Tree<T>> &used)
+  void BuildTreeHelper(Tree<T> &root, std::vector<Tree<T>> &array)
   {
+    for(int i = 0; i < array.size() ; i++) {
+      root.add
+    }
+  }
+  Tree() {
+
   }
 
 public:
@@ -39,6 +45,10 @@ public:
     id = other.id;
     mData = other.mData;
   }
+  
+  void AddEdge(const Tree<T> & node) {
+    edge.emplace_back(std::make_shared<Tree<T>>(node));
+  }
 
   friend std::ostream &operator<<(std::ostream &out, const Tree<T> &item)
   {
@@ -51,16 +61,16 @@ public:
 
   void BuildTree()
   {
-    std::vector<Tree<T>> usedArray;
-    std::vector<Tree<T>> used;
+    
+    Tree<T> dummy;
+    BuildTreeHelper(dummy,edge);
+    // for (auto : all)
+    // {
+    //   std::shared_ptr<Tree<T>> ptr(new Tree<T>(item));
+    //   usedArray.emplace_back(*ptr);
+    //   edge.push_back(std::move(ptr));
+    // }
 
-    for (auto &item : all)
-    {
-      std::shared_ptr<Tree<T>> ptr(new Tree<T>(item));
-      usedArray.emplace_back(*ptr);
-      edge.push_back(std::move(ptr));
-    }
-    BuildTreeHelper(*this, all.size(), used, usedArray);
   }
 
   std::vector<Dtype> GetResults()
@@ -73,4 +83,5 @@ int main()
   Tree<int> test{{1, 2, 3, 4}};
   test.BuildTree();
   std::cout << test << std::endl;
+  return 0;
 }
