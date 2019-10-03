@@ -32,38 +32,43 @@ private:
   {
   }
 
-  void BuildTreeHelper(Tree<T> &root, std::vector<std::shared_ptr<Tree<T>>> &array)
+  void BuildTreeHelper(Tree<T> &root, std::vector<std::shared_ptr<Tree<T>>> array)
   {
     std::vector<std::shared_ptr<Tree<T>>> tmp;
     mBuilded = true;
-
+    
+    //1 (2,3)
+    //1->2,(2,(3))
+    //2->3
+    //1->3,(3,2)
+    //3->2
+    //  
     for (int i = 0; i < array.size(); i++)
     {
-      // auto r = root;
+      root.AddEdge(*array[i]);
       tmp.clear();
-      for (int j = 0; j < array.size(); j++)
-      {
-
-        if (array[j]->mData != array[i]->mData)
-        {
-          tmp.push_back(array[j]);
-          //Get*array[i]ting new copy
-          // std::cout << "( root :" << root.mData << " ) " << array[j]->mData << std::endl;
-          // root.edge.push_back(std::make_shared<Tree<T>>(*array[j]));
+      std::cout << "ROOT : " << root.mData << "  edge :  "<<array[i]->mData << std::endl;
+      for(int j = 0;j < array.size(); j++ ) {
+        if(i!=j) {
+          // doing deep copy of underlaying object
+          tmp.push_back(std::make_shared<Tree<T>>(*array[j]));
         }
       }
-      std::cout << " root data " << array[i]->mData << " ";
-      std::shared_ptr<Tree<T>> r(&root, CustomDltr);
-      for (int k = 0; k < array.size(); k++)
-      {
-        std::shared_ptr<Tree<T>> ptr(std::make_shared<Tree<T>>(*array[k]));
-        r->edge.push_back(ptr);
-        r.reset();
-        r = ptr;
-      }
 
-      BuildTreeHelper(*array[i], tmp);
+      BuildTreeHelper(*array[i],tmp);
+  
     }
+    //std::cout << " root data " << array[i]->mData << " ";
+    //std::shared_ptr<Tree<T>> r(&root, CustomDltr);
+      // for (int k = 0; k < array.size(); k++)
+      // {
+      //   std::shared_ptr<Tree<T>> ptr(std::make_shared<Tree<T>>(*array[k]));
+      //   r->edge.push_back(ptr);
+      //   r.reset();
+      //   r = ptr;
+      // }
+
+    
   }
   Tree()
   {
@@ -106,7 +111,7 @@ public:
     //Make share will ask for copy but underlaying
     //Object needs to modified in future;
 
-    edge.emplace_back(ptr);
+     edge.emplace_back(ptr);
   }
 
   friend std::ostream &operator<<(std::ostream &out, const Tree<T> &item)
