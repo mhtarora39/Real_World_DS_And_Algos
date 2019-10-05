@@ -98,7 +98,8 @@ public:
     std::vector<Graph<T>>
     DijkstraShortestPath()
     {
-    
+        
+        std::vector<GraphPTR> tmp;
         //we should be knowing in advance what node should be participting
         //in advance
         mPath[0]->mDist = 0;
@@ -116,25 +117,33 @@ public:
                 {
                     
                     minNode->mEdges[i].edge->mDist = minNode->mDist + minNode->mEdges[i].weight;
-
                     minNode->mEdges[i].edge->mParent = std::make_shared<Graph<T>>(*minNode);
+
+                    // Front 
 
                 }
             }
         }
         
+        std::vector<Graph<T>> pathToParent;
+        GraphPTR graph = mPath[mPath.size() -1];
+        
+        while(graph) {
+          
+          pathToParent.push_back(graph);
+          graph = graph->mParent;
+        
+        }
 
-        // BuildShortest Path 
+        if(graph->mID == mPath[0]->mID) {
+           
+          pathToParent.push_back(graph);
 
-        std::vector<GraphPTR> tmp;
+        }
 
-
-        //find min all the node
-
-        //updating parent relationship;
-        //if dist[u] + weight[u to v] < dist[v]
-        //dist[v] -> Parent dist[u];
-        //dist[v] -> dist
+        
+        return pathToParent;
+        
     }
 
 private:
