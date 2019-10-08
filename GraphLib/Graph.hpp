@@ -12,6 +12,16 @@ class Graph;
 //Should change every thing with row pointers as we are not
 //going to dlete not by overselves
 
+namespace AtomicOps
+{
+  int GetID()
+  {
+    static std::atomic<int> id(0);
+    return id++;
+  }
+
+} // namespace AtomicOPS
+
 template <typename T>
 void no_op_int(Graph<T> *ptr)
 {
@@ -21,44 +31,44 @@ void no_op_int(Graph<T> *ptr)
 template <typename T>
 class GraphFectory
 {
-  std::map<T, std::shared_ptr<Graph<T>>> mGraphDataMap;
+  std::map<std::pair<T,int>, std::shared_ptr<Graph<T>>> mGraphDataMap;
   // std::vector<std::shared_ptr<Graph<T>>> mNodes;
+
+  std::shared_ptr<Graph<T>> GetObjectPTR(T &data, int id)
+  {
+    auto pair = std::make_pair<T&,int&>(data,id);
+    if (mGraphDataMap.find(pair) == mGraphDataMap.end())
+    {
+      mGraphDataMap[pair] = std::make_shared<Graph<T>>(data);
+      mGraphDataMap[pair]->mID = id;
+      (Graph<T>::mPath).push_back(mGraphDataMap[pair]);
+    }
+
+    return (mGraphDataMap[pair]);
+  }
+
+  void BuildGraphHelper(T &src, int weight, T &dest,int srcID = -1,int dstID = -1) {
+    auto &srcNode = (GetObject(src,srcID));
+    auto &dstNode = (GetObject(dest,dstID));
+    srcNode.AddEdge(dstNode, weight);
+  }
 
 public:
   GraphFectory()
   {
   }
-  //Memory going to manage by Fectory
-  Graph<T> &GetObject(T &data)
+
+  //ID is provided by GETID fuction 
+  Graph<T> &GetObject(T &data, int id = -1)
   {
-
-    if (mGraphDataMap.find(data) != mGraphDataMap.end())
-    {
-
-      return *(mGraphDataMap[data].get());
-    }
-    else
-    {
-      mGraphDataMap[data] = std::make_shared<Graph<T>>(data);
-      (Graph<T>::mPath).push_back(mGraphDataMap[data]);
-      return *(mGraphDataMap[data].get());
-    }
+    return *GetObjectPTR((data),id);
   }
 
-  Graph<T> &GetObject(T &&data)
-  {
-    if (mGraphDataMap.find(data) != mGraphDataMap.end())
-    {
 
-      //mNodes.push_back(mGraphDataMap[data]);
-      return *(mGraphDataMap[data].get());
-    }
-    else
-    {
-      mGraphDataMap[data] = std::make_shared<Graph<T>>(std::move(data));
-      (Graph<T>::mPath).push_back(mGraphDataMap[data]);
-      return *(mGraphDataMap[data].get());
-    }
+
+  Graph<T> &GetObject(T &&data, int id = - 1)
+  {
+    return *GetObjectPTR((data),id);
   }
 
   //*************************************
@@ -66,18 +76,18 @@ public:
   //This provide easy way to add the
   //graph like (src node ---W--- dst-node)
 
-  void BuildGraph(T &&src, int weight, T &&dest)
-  {
-    auto &srcNode = (GetObject(src));
-    auto &dstNode = (GetObject(dest));
-    srcNode.AddEdge(dstNode, weight);
+  void BuildGraph(T &&src, int weight, T &&dest, int srcID = -1,int dstID = -1)
+  { 
+    //Not need to move data as we are storing the copy of the data it will get 
+    // distroyed
+
+    BuildGraphHelper((src),weight,(dest),srcID,dstID);
+    
   }
 
-  void BuildGraph(T &src, int weight, T &dest)
+  void BuildGraph(T &src, int weight, T &dest, int srcID = -1,int dstID = -1)
   {
-    auto srcNode = GetObject(src);
-    auto dstNode = GetObject(dest);
-    srcNode.AddEdge(dstNode, weight);
+     BuildGraphHelper(src,weight,dest,srcID,dstID); 
   }
 
   std::vector<std::shared_ptr<Graph<T>>> &GetAllNodes()
@@ -88,11 +98,7 @@ public:
 
 //template <typename T>
 
-int GetID()
-{
-  static std::atomic<int> id(0);
-  return id++;
-}
+
 
 template <typename T>
 class Graph
@@ -121,7 +127,10 @@ public:
     GraphPTR ptr(&edge, no_op_int<T>);
     mPath.push_back(ptr);
   }
-
+  
+  T& GetData() {
+    return mData;
+  }
   Graph(const Graph<T> &copy)
   {
     mID = copy.mID;
@@ -143,17 +152,18 @@ public:
     mVisited = copy.mVisited;
   }
 
-  Graph(T &data) : mData(data)
+  Graph(T &data,int id = -1) : mData(data)
   {
     mDist = INT32_MAX;
     mVisited = false;
-    mID = GetID();
+    mID = id;
   }
-  Graph(T &&data) : mData(std::move(data))
+
+  Graph(T &&data, int id = -1) : mData(std::move(data))
   {
     mDist = INT32_MAX;
     mVisited = false;
-    mID = GetID();
+    mID = id;
   }
 
   void AddEdge(Graph<T> &edge, int weight = 1)
