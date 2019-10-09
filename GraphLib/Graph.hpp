@@ -6,24 +6,24 @@
 #include <atomic>
 #include <map>
 
+namespace AtomicOps
+{
+int GetID()
+{
+  static std::atomic<int> id(0);
+  return id++;
+}
+
+} // namespace AtomicOps
+
+//Should change every thing with row pointers as we are not
+//going to delete not by overselves
+
 template <typename T>
 class Graph;
 
-//Should change every thing with row pointers as we are not
-//going to dlete not by overselves
-
-namespace AtomicOps
-{
-  int GetID()
-  {
-    static std::atomic<int> id(0);
-    return id++;
-  }
-
-} // namespace AtomicOPS
-
 template <typename T>
-void no_op_int(Graph<T> *ptr)
+void no_op(Graph<T> *ptr)
 {
   // for locally created obejects;
 }
@@ -31,150 +31,99 @@ void no_op_int(Graph<T> *ptr)
 template <typename T>
 class GraphFectory
 {
-  std::map<std::pair<T,int>, std::shared_ptr<Graph<T>>> mGraphDataMap;
-  // std::vector<std::shared_ptr<Graph<T>>> mNodes;
-
-  std::shared_ptr<Graph<T>> GetObjectPTR(T &data, int id)
-  {
-    auto pair = std::make_pair<T&,int&>(data,id);
-    if (mGraphDataMap.find(pair) == mGraphDataMap.end())
-    {
-      mGraphDataMap[pair] = std::make_shared<Graph<T>>(data);
-      mGraphDataMap[pair]->mID = id;
-      (Graph<T>::mPath).push_back(mGraphDataMap[pair]);
-    }
-
-    return (mGraphDataMap[pair]);
-  }
-
-  void BuildGraphHelper(T &src, int weight, T &dest,int srcID = -1,int dstID = -1) {
-    auto &srcNode = (GetObject(src,srcID));
-    auto &dstNode = (GetObject(dest,dstID));
-    srcNode.AddEdge(dstNode, weight);
-  }
 
 public:
   GraphFectory()
   {
   }
-
-  //ID is provided by GETID fuction 
-  Graph<T> &GetObject(T &data, int id = -1)
+  
+  //ID is provided by GETID fuction
+  Graph<T> &GetObject(T &data, int id = -1, bool addToPath = false)
   {
-    return *GetObjectPTR((data),id);
+    return *GetObjectPTR(data, id, addToPath);
   }
 
-
-
-  Graph<T> &GetObject(T &&data, int id = - 1)
+  Graph<T> &GetObject(T &&data, int id = -1, bool addToPath = false)
   {
-    return *GetObjectPTR((data),id);
+    //no need to move as we are creating copy of it
+
+    return *GetObjectPTR(data, id, addToPath);
   }
 
   //*************************************
 
-  //This provide easy way to add the
   //graph like (src node ---W--- dst-node)
 
-  void BuildGraph(T &&src, int weight, T &&dest, int srcID = -1,int dstID = -1)
-  { 
-    //Not need to move data as we are storing the copy of the data it will get 
-    // distroyed
-
-    BuildGraphHelper((src),weight,(dest),srcID,dstID);
-    
+  void BuildGraph(T &&src, int weight, T &&dest, int srcID = -1, int dstID = -1, bool srcAddToPath = false, bool dstAddToPath = false)
+  {
+    BuildGraphHelper(src, weight, dest, srcID, dstID, srcAddToPath, dstAddToPath);
   }
 
-  void BuildGraph(T &src, int weight, T &dest, int srcID = -1,int dstID = -1)
+  void BuildGraph(T &src, int weight, T &dest, int srcID = -1, int dstID = -1, bool srcAddToPath = false, bool dstAddToPath = false)
   {
-     BuildGraphHelper(src,weight,dest,srcID,dstID); 
+    BuildGraphHelper(src, weight, dest, srcID, dstID, srcAddToPath, dstAddToPath);
   }
 
   std::vector<std::shared_ptr<Graph<T>>> &GetAllNodes()
   {
-    return Graph<T>::mPath;
+    return mCurrentPath; //Client can manupulate path
   }
+
+private:
+  std::shared_ptr<Graph<T>> GetObjectPTR(T &data, int id, bool addToPath)
+  {
+    auto pair = std::make_pair<T &, int &>(data, id);
+    if (mGraphDataMap.find(pair) == mGraphDataMap.end())
+    {
+      //creating copy of data as life of object should be manged by
+      //this class. It will manage both lvalue as well as rvalue
+
+      mGraphDataMap[pair] = std::make_shared<Graph<T>>(Graph<T>(data));
+      mGraphDataMap[pair]->mID = id;
+      mTotalPath.push_back(mGraphDataMap[pair]);
+      if (addToPath)
+      {
+        mCurrentPath.push_back(mGraphDataMap[pair]);
+      }
+    }
+
+    return (mGraphDataMap[pair]);
+  }
+
+  void BuildGraphHelper(T &src, int weight, T &dest, int srcID = -1, int dstID = -1, bool srcAddToPath = false, bool dstAddToPath = false)
+  {
+    auto &srcNode = (GetObject(src, srcID,srcAddToPath));
+    auto &dstNode = (GetObject(dest, dstID,dstAddToPath));
+    srcNode.AddEdge(dstNode, weight);
+  }
+  std::map<std::pair<T, int>, std::shared_ptr<Graph<T>>> mGraphDataMap;
+  std::vector<std::shared_ptr<Graph<T>>> mCurrentPath;
+  std::vector<std::shared_ptr<Graph<T>>> mTotalPath;
 };
 
-//template <typename T>
-
-
-
 template <typename T>
-class Graph
+class GraphAlgo
 {
   typedef std::shared_ptr<Graph<T>> GraphPTR;
 
-  Graph()
-  {
-  }
-  void clearMeta()
-  {
-
-    mParent = nullptr;
-    mVisited = false;
-    mDist = INT16_MAX;
-  }
-
 public:
-  void SetPath(std::vector<GraphPTR> &gPtr)
+  GraphAlgo(std::vector<std::shared_ptr<Graph<T>>> &path) : mPath(path)
   {
-    mPath = gPtr;
   }
 
-  void AddToPath(Graph<T> &edge)
+  bool isDirty()
   {
-    GraphPTR ptr(&edge, no_op_int<T>);
-    mPath.push_back(ptr);
-  }
-  
-  T& GetData() {
-    return mData;
-  }
-  Graph(const Graph<T> &copy)
-  {
-    mID = copy.mID;
-    mData = copy.mData;
-    mEdges.clear();
-    mEdges = copy.mEdges;
-    mDist = copy.mDist;
-    mVisited = copy.mVisited;
-    mParent = nullptr;
+    return mDirty;
   }
 
-  Graph<T> &operator=(const Graph<T> &copy)
+  void Clear()
   {
-    mID = copy.mID;
-    mData = copy.mData;
-    mEdges.clear();
-    mEdges = copy.mEdges;
-    mDist = copy.mDist;
-    mVisited = copy.mVisited;
-  }
-
-  Graph(T &data,int id = -1) : mData(data)
-  {
-    mDist = INT32_MAX;
-    mVisited = false;
-    mID = id;
-  }
-
-  Graph(T &&data, int id = -1) : mData(std::move(data))
-  {
-    mDist = INT32_MAX;
-    mVisited = false;
-    mID = id;
-  }
-
-  void AddEdge(Graph<T> &edge, int weight = 1)
-  {
-    //Don't copy
-    GraphPTR ptr(&edge, no_op_int<T>);
-    mEdges.push_back(GraphMeta(ptr, weight));
+    mDirty = false;
   }
 
   const GraphPTR findMin()
   {
+
     int dist = INT32_MAX;
     GraphPTR minNode;
     int index = -1;
@@ -197,6 +146,12 @@ public:
   std::vector<Graph<T>>
   DijkstraShortestPath()
   {
+    if (mPath.empty())
+    {
+      return mPath;
+    }
+
+    mDirty = true;
 
     std::vector<GraphPTR> tmp;
     //we should be knowing in advance which nodes are going to participte
@@ -242,16 +197,101 @@ public:
   }
 
 private:
+  bool mDirty;
+};
+//template <typename T>
+
+template <typename T>
+class Graph
+{
+  typedef std::shared_ptr<Graph<T>> GraphPTR;
+
+public:
+  T &GetData()
+  {
+    return mData;
+  }
+
+  void AddEdge(Graph<T> &edge, int weight = 1)
+  {
+    //Don't copy
+    GraphPTR ptr(&edge, no_op<T>);
+    mEdges.push_back(GraphMeta(ptr, weight));
+  }
+
+  void SetPath(std::vector<GraphPTR> &gPtr)
+  {
+    mPath = gPtr;
+  }
+
+  void ClearPath()
+  {
+    mPath.clear();
+  }
+
+  void AddToPath(Graph<T> &edge)
+  {
+    //TODO replace by raw ptr as memory going to managed by calling
+    //function
+    GraphPTR ptr(&edge, no_op<T>);
+    mPath.push_back(ptr);
+  }
+
+  Graph(const Graph<T> &&copy) : mID(copy.mID),
+                                 mData(std::move(copy.mData)),
+                                 mEdges(std::move(copy.mEdges)),
+                                 mDist(std::move(copy.mDist)),
+                                 mVisited(copy.mVisited)
+
+  {
+    //   mParent(nullptr);
+  }
+
+  Graph<T> &operator=(const Graph<T> &&copy)
+  {
+    mID = copy.mID;
+    mData = std::move(copy.mData);
+    mEdges = std::move(copy.mEdges);
+    mDist = std::move(copy.mDist);
+    mVisited = copy.mVisited;
+    mParent = std::move(mParent);
+  }
+
+private:
+  Graph()
+  {
+  }
+  void clearMeta()
+  {
+
+    mParent = nullptr;
+    mVisited = false;
+    mDist = INT16_MAX;
+  }
+
+  Graph(T &data, int id = -1) : mData(data)
+  {
+    mDist = INT32_MAX;
+    mVisited = false;
+    mID = id;
+  }
+
+  Graph(T &&data, int id = -1) : mData(std::move(data))
+  {
+    mDist = INT32_MAX;
+    mVisited = false;
+    mID = id;
+  }
+
   struct GraphMeta
   {
     GraphMeta(GraphPTR ptr, int wt) : edge(ptr), weight(wt)
     {
     }
 
-    GraphMeta(const GraphMeta &other)
+    GraphMeta(const GraphMeta &other) : weight(other.weight),
+                                        edge(other.edge)
     {
-      weight = other.weight;
-      edge = other.edge;
     }
 
     GraphMeta &operator=(const GraphMeta &other)
@@ -264,16 +304,14 @@ private:
     Graph::GraphPTR edge;
   };
 
+public:
   friend class GraphFectory<T>;
-
+  friend class GraphAlgo<T>;
   T mData;
   int mDist;
   GraphPTR mParent;
   bool mVisited;
   std::vector<GraphMeta> mEdges;
-  static std::vector<GraphPTR> mPath;
+  std::vector<GraphPTR> mPath;
   int mID;
 };
-
-template <typename T>
-std::vector<std::shared_ptr<Graph<T>>> Graph<T>::mPath = {};
