@@ -1,4 +1,3 @@
-//Debugging
 
 #include <iostream>
 #include <memory>
@@ -16,27 +15,25 @@ int GetID()
 
 } // namespace AtomicOps
 
-//Should change every thing with row pointers as we are not
-//going to delete not by overselves
-
 template <typename T>
 class Graph;
 
 template <typename T>
-void no_op(Graph<T> *ptr)
-{
-  // for locally created obejects;
-}
-
-template <typename T>
-class GraphFectory
+class GraphFactory
 {
 
 public:
-  GraphFectory()
+  GraphFactory()
   {
   }
-  
+
+  ~GraphFactory()
+  {
+    mGraphDataMap.clear();
+    mCurrentPath.clear();
+    mTotalPath.clear();
+  }
+
   //ID is provided by GETID fuction
   Graph<T> &GetObject(T &data, int id = -1, bool addToPath = false)
   {
@@ -64,21 +61,35 @@ public:
     BuildGraphHelper(src, weight, dest, srcID, dstID, srcAddToPath, dstAddToPath);
   }
 
-  std::vector<std::shared_ptr<Graph<T>>> &GetAllNodes()
+  std::vector<std::shared_ptr<Graph<T>>> GetAllNodes()
   {
-    return mCurrentPath; //Client can manupulate path
+    return mTotalPath;
+  }
+
+  std::vector<std::shared_ptr<Graph<T>>> GetCurrentPath()
+  {
+    return mCurrentPath;
+  }
+
+  void ClearCurrentPath()
+  {
+    mCurrentPath.clear();
+  }
+
+  void AddToCurrentPath(Graph<T> &obj, int id = -1)
+  {
+    auto pathPTR = GetObjectPTR(obj.mData, id);
+    mCurrentPath.push_back(pathPTR);
   }
 
 private:
-  std::shared_ptr<Graph<T>> GetObjectPTR(T &data, int id, bool addToPath)
+  std::shared_ptr<Graph<T>> &GetObjectPTR(T &data, int id, bool addToPath)
   {
     auto pair = std::make_pair<T &, int &>(data, id);
     if (mGraphDataMap.find(pair) == mGraphDataMap.end())
     {
-      //creating copy of data as life of object should be manged by
-      //this class. It will manage both lvalue as well as rvalue
 
-      mGraphDataMap[pair] = std::make_shared<Graph<T>>(Graph<T>(data));
+      mGraphDataMap[pair] = std::make_shared<Graph<T>>(Graph<T>(std::forward<T>(data)));
       mGraphDataMap[pair]->mID = id;
       mTotalPath.push_back(mGraphDataMap[pair]);
       if (addToPath)
@@ -92,8 +103,8 @@ private:
 
   void BuildGraphHelper(T &src, int weight, T &dest, int srcID = -1, int dstID = -1, bool srcAddToPath = false, bool dstAddToPath = false)
   {
-    auto &srcNode = (GetObject(src, srcID,srcAddToPath));
-    auto &dstNode = (GetObject(dest, dstID,dstAddToPath));
+    auto &srcNode = (GetObject(src, srcID, srcAddToPath));
+    auto &dstNode = (GetObject(dest, dstID, dstAddToPath));
     srcNode.AddEdge(dstNode, weight);
   }
   std::map<std::pair<T, int>, std::shared_ptr<Graph<T>>> mGraphDataMap;
@@ -104,21 +115,20 @@ private:
 template <typename T>
 class GraphAlgo
 {
+
   typedef std::shared_ptr<Graph<T>> GraphPTR;
 
 public:
-  GraphAlgo(std::vector<std::shared_ptr<Graph<T>>> &path) : mPath(path)
+  GraphAlgo(std::vector<GraphPTR> &path) : mPath(path)
   {
-  }
-
-  bool isDirty()
-  {
-    return mDirty;
   }
 
   void Clear()
   {
-    mDirty = false;
+    for (auto item : mPath)
+    {
+      item->ClearMeta();
+    }
   }
 
   const GraphPTR findMin()
@@ -146,15 +156,15 @@ public:
   std::vector<Graph<T>>
   DijkstraShortestPath()
   {
-    if (mPath.empty())
-    {
-      return mPath;
-    }
-
-    mDirty = true;
 
     std::vector<GraphPTR> tmp;
-    //we should be knowing in advance which nodes are going to participte
+    std::vector<Graph<T>> pathToParent;
+    if (mPath.empty())
+    {
+      pathToParent;
+    }
+
+    //we should be knowing in advance which nodes are going to participate
     //mPath variable should be static varable
     mPath[0]->mDist = 0;
     // or we can find all pair shortest path
@@ -166,6 +176,11 @@ public:
 
       for (int i = 0; i < size; i++)
       {
+
+        if (minNode->mEdges[i].weight < 0)
+        {
+          return pathToParent;
+        }
 
         if (minNode->mEdges[i].edge->mDist > minNode->mDist + minNode->mEdges[i].weight)
         {
@@ -179,7 +194,6 @@ public:
       }
     }
 
-    std::vector<Graph<T>> pathToParent;
     GraphPTR graph = mPath[mPath.size() - 1];
 
     while (graph)
@@ -188,18 +202,20 @@ public:
       graph = graph->mParent;
     }
 
-    // if (graph->mID == mPath[0]->mID)
-    // {
-    //   pathToParent.push_back(*graph);
-    // }
-
     return pathToParent;
   }
 
 private:
-  bool mDirty;
+  std::vector<GraphPTR> mPath;
 };
-//template <typename T>
+
+template <typename T>
+class Graph;
+
+template <typename T>
+void no_op(Graph<T> *)
+{
+}
 
 template <typename T>
 class Graph
@@ -212,9 +228,20 @@ public:
     return mData;
   }
 
+  ~Graph()
+  {
+    mPath.clear();
+  }
+
   void AddEdge(Graph<T> &edge, int weight = 1)
   {
-    //Don't copy
+
+    // Don't copy we need ref
+    // As client function is going
+    // to manage memory of obj we shouldn't be
+    // deleting obj;
+    // TODO : use instead raw pointer here
+
     GraphPTR ptr(&edge, no_op<T>);
     mEdges.push_back(GraphMeta(ptr, weight));
   }
@@ -231,8 +258,7 @@ public:
 
   void AddToPath(Graph<T> &edge)
   {
-    //TODO replace by raw ptr as memory going to managed by calling
-    //function
+    //TODO : use insted raw pointer here
     GraphPTR ptr(&edge, no_op<T>);
     mPath.push_back(ptr);
   }
@@ -242,6 +268,16 @@ public:
                                  mEdges(std::move(copy.mEdges)),
                                  mDist(std::move(copy.mDist)),
                                  mVisited(copy.mVisited)
+
+  {
+    //   mParent(nullptr);
+  }
+
+  Graph(const Graph<T> &copy) : mID(copy.mID),
+                                mData(copy.mData),
+                                mEdges(copy.mEdges),
+                                mDist(copy.mDist),
+                                mVisited(copy.mVisited)
 
   {
     //   mParent(nullptr);
@@ -257,6 +293,16 @@ public:
     mParent = std::move(mParent);
   }
 
+  Graph<T> &operator=(const Graph<T> &copy)
+  {
+    mID = copy.mID;
+    mData = (copy.mData);
+    mEdges = (copy.mEdges);
+    mDist = (copy.mDist);
+    mVisited = copy.mVisited;
+    mParent = (mParent);
+  }
+
 private:
   Graph()
   {
@@ -266,7 +312,7 @@ private:
 
     mParent = nullptr;
     mVisited = false;
-    mDist = INT16_MAX;
+    mDist = INT32_MAX;
   }
 
   Graph(T &data, int id = -1) : mData(data)
@@ -304,8 +350,8 @@ private:
     Graph::GraphPTR edge;
   };
 
-public:
-  friend class GraphFectory<T>;
+private:
+  friend class GraphFactory<T>;
   friend class GraphAlgo<T>;
   T mData;
   int mDist;
