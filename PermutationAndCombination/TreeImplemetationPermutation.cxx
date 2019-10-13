@@ -36,39 +36,38 @@ private:
   {
     std::vector<std::shared_ptr<Tree<T>>> tmp;
     mBuilded = true;
-    
+
     //1 (2,3)
     //1->2,(2,(3))
     //2->3
     //1->3,(3,2)
     //3->2
-    //  
+    //
     for (int i = 0; i < array.size(); i++)
     {
       root.AddEdge(*array[i]);
       tmp.clear();
-      std::cout << "ROOT : " << root.mData << "  edge :  "<<array[i]->mData << std::endl;
-      for(int j = 0;j < array.size(); j++ ) {
-        if(i!=j) {
+      std::cout << "ROOT : " << root.mData << "  edge :  " << array[i]->mData << std::endl;
+      for (int j = 0; j < array.size(); j++)
+      {
+        if (i != j)
+        {
           // doing deep copy of underlaying object
           tmp.push_back(std::make_shared<Tree<T>>(*array[j]));
         }
       }
 
-      BuildTreeHelper(*array[i],tmp);
-  
+      BuildTreeHelper(*array[i], tmp);
     }
     //std::cout << " root data " << array[i]->mData << " ";
     //std::shared_ptr<Tree<T>> r(&root, CustomDltr);
-      // for (int k = 0; k < array.size(); k++)
-      // {
-      //   std::shared_ptr<Tree<T>> ptr(std::make_shared<Tree<T>>(*array[k]));
-      //   r->edge.push_back(ptr);
-      //   r.reset();
-      //   r = ptr;
-      // }
-
-    
+    // for (int k = 0; k < array.size(); k++)
+    // {
+    //   std::shared_ptr<Tree<T>> ptr(std::make_shared<Tree<T>>(*array[k]));
+    //   r->edge.push_back(ptr);
+    //   r.reset();
+    //   r = ptr;
+    // }
   }
   Tree()
   {
@@ -111,7 +110,7 @@ public:
     //Make share will ask for copy but underlaying
     //Object needs to modified in future;
 
-     edge.emplace_back(ptr);
+    edge.emplace_back(ptr);
   }
 
   friend std::ostream &operator<<(std::ostream &out, const Tree<T> &item)
@@ -167,61 +166,62 @@ void Test(int &a, std::vector<int> b)
   Test(z, b);
 }
 class solution;
-void BuildTree(solution * root, int n);
+void BuildTree(solution *root, int n);
 
-class solution {
-   std::vector<solution * > edges; 
-  
-   
+class solution
+{
+  std::vector<solution *> edges;
+
 public:
-    solution() {
+  solution()
+  {
+  }
 
-    }
+  int data;
+  int sum;
 
-
-    int data;
-    int sum;
-    
-    void AddEdge(solution *edge) {
-      edges.push_back(edge);
-    }
-    int climbStairs(int n) {
-      sum = 0;
-      BuildTree(this,n);
-      //asjhas
-      return 0;  
-    }
+  void AddEdge(solution *edge)
+  {
+    edges.push_back(edge);
+  }
+  int climbStairs(int n)
+  {
+    sum = 0;
+    BuildTree(this, n);
+    //asjhas
+    return 0;
+  }
 };
 
+void BuildTree(solution *root, int n)
+{
+  solution *newNode = new solution();
+  newNode->data = 1;
+  newNode->sum = root->sum + newNode->data;
+  if (newNode->sum <= n)
+  {
+    root->AddEdge(newNode);
+    BuildTree(newNode, n);
+  }
+  else
+  {
+    return;
+  }
 
-void BuildTree(solution * root, int n) {
-    solution * newNode = new solution();
-    newNode->data = 1;
-    newNode->sum = root->sum + newNode->data;
-    if(newNode->sum <= n) {
-      root->AddEdge(newNode);
-      BuildTree(newNode,n ); 
-    }
-    else {
-        return;
-    }
-    
-    newNode = new solution();
-    newNode->data = 2;
-   
-    newNode->sum = root->sum + newNode->data;
-    if(newNode->sum <= n) {
-      root->AddEdge(newNode);
-      BuildTree(newNode,n ); 
-      
-    }
-    else {
-        return;
-    }
-       
+  newNode = new solution();
+  newNode->data = 2;
+
+  newNode->sum = root->sum + newNode->data;
+  if (newNode->sum <= n)
+  {
+    root->AddEdge(newNode);
+    BuildTree(newNode, n);
+  }
+  else
+  {
+    return;
+  }
 }
-
-
 
 int main()
 {
