@@ -166,27 +166,87 @@ void Test(int &a, std::vector<int> b)
   b.pop_back();
   Test(z, b);
 }
+class solution;
+void BuildTree(solution * root, int n);
+
+class solution {
+   std::vector<solution * > edges; 
+  
+   
+public:
+    solution() {
+
+    }
+
+
+    int data;
+    int sum;
+    
+    void AddEdge(solution *edge) {
+      edges.push_back(edge);
+    }
+    int climbStairs(int n) {
+      sum = 0;
+      BuildTree(this,n);
+   
+      return 0;  
+    }
+};
+
+
+void BuildTree(solution * root, int n) {
+    solution * newNode = new solution();
+    newNode->data = 1;
+    newNode->sum = root->sum + newNode->data;
+    if(newNode->sum <= n) {
+      root->AddEdge(newNode);
+      BuildTree(newNode,n ); 
+    }
+    else {
+        return;
+    }
+    
+    newNode = new solution();
+    newNode->data = 2;
+   
+    newNode->sum = root->sum + newNode->data;
+    if(newNode->sum <= n) {
+      root->AddEdge(newNode);
+      BuildTree(newNode,n ); 
+      
+    }
+    else {
+        return;
+    }
+       
+}
+
+
+
 int main()
 {
-  Tree<int> test{{1, 2, 3}};
-  test.BuildTree();
-  std::cout << test << std::endl;
-  int a = -1;
 
-  std::vector<std::vector<int>> data;
+  solution sln;
+  sln.climbStairs(5);
+  // Tree<int> test{{1, 2, 3}};
+  // test.BuildTree();
+  // std::cout << test << std::endl;
+  // int a = -1;
 
-  test.GetResults(test, data);
+  // std::vector<std::vector<int>> data;
 
-  for (int i = 0; i < data.size(); i++)
-  {
-    for (int j = 0; j < data[i].size(); j++)
-    {
-      std::cout << data[i][j];
-    }
-    std::cout << "\n";
-  }
+  // test.GetResults(test, data);
 
-  Test(a, {1, 2, 3});
-  std::cout << "a = " << a;
-  return 0;
+  // for (int i = 0; i < data.size(); i++)
+  // {
+  //   for (int j = 0; j < data[i].size(); j++)
+  //   {
+  //     std::cout << data[i][j];
+  //   }
+  //   std::cout << "\n";
+  // }
+
+  // Test(a, {1, 2, 3});
+  // std::cout << "a = " << a;
+  // return 0;
 }
