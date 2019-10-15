@@ -7,7 +7,7 @@
 #include <iostream>
 #include <vector>
 #define ONE 1
-#define TWO 2
+#define TWO 7
 
 //Time  Complexity => 2pow(n)
 //Space complexity => 2pow(n)
@@ -52,27 +52,45 @@ int countWays(int s, int m)
   return countWaysUtil(s + 1, m);
 }
 
+//This can't be done without array 
 int numberOfSteps_1(int dest)
 {
+  std::vector<int> stepsArray;
+
   auto first = 1;
   int second = first;
-  if (TWO <= dest)
+  if (TWO > dest)
   {
-    second = 2;
+    return 1;
   }
-  int tmp = second;
-  for (auto i = TWO + 1; i <= dest; i++)
-  {
-    tmp = first + second;
-    first = second;
-    second = tmp;
+  else if (dest == TWO) {
+    return 2;
   }
 
-  return tmp;
+  stepsArray.assign(TWO-1,1);
+  stepsArray.push_back(2);
+  second = TWO-1;
+  
+  first  = 0;
+  for (auto i = TWO ; i < dest; i++)
+  {
+    
+    int tmp = stepsArray[first] +stepsArray[second];
+    //4  =  //3   //2
+    // 6
+    stepsArray.push_back(tmp);
+    first++;
+    second++;
+  }
+
+  return stepsArray.back();
 }
 
 int main()
 {
-  std::cout << numberOfSteps_1(4) << std::endl;
+  std::cout << " Recursive " <<numberOfSteps(10) << std::endl;
+   std::cout <<" Iter "  <<numberOfSteps_1(10) << std::endl;
   return 0;
 }
+
+
