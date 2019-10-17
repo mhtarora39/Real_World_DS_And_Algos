@@ -173,11 +173,25 @@
 
 // template <typename ItemType>
 // void LinkedList<ItemType>::setEntry(int position, const ItemType &newEntry){}
+class A {
+  public:
+  A() {
+    std::cout << "New " << std::endl;
+  }
 
+  ~A() {
+    std::cout << "DLT" << std::endl;
+  }
+};
 
 
 int main()
 {
+
+  std::shared_ptr<A> a(new A());
+  
+  a.reset(new A());
+
   GraphFactory<int> obj;
   obj.BuildGraph(1, 1, 2);
   obj.BuildGraph(2, 1, 6);

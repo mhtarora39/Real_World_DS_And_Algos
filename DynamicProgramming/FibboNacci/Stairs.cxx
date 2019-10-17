@@ -86,8 +86,19 @@ int numberOfSteps_1(int dest)
   return stepsArray.back();
 }
 
+class Test {
+  public: 
+  Test() {
+
+  }
+  private:
+  int miTest;
+};
+
 int main()
 {
+  Test a;
+  
   std::cout << " Recursive " <<numberOfSteps(10) << std::endl;
    std::cout <<" Iter "  <<numberOfSteps_1(10) << std::endl;
   return 0;

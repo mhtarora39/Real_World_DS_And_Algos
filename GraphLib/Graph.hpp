@@ -242,8 +242,9 @@ public:
     // deleting obj;
     // TODO : use instead raw pointer here
 
-    GraphPTR ptr(&edge, no_op<T>);
-    mEdges.push_back(GraphMeta(ptr, weight));
+    GraphPTR oPtr(&edge, no_op<T>);
+    GraphPTR iPtr(this, no_op<T>);
+    mEdges.push_back(GraphMeta(oPtr, iPtr, weight));
   }
 
   void SetPath(std::vector<GraphPTR> &gPtr)
@@ -331,23 +332,27 @@ private:
 
   struct GraphMeta
   {
-    GraphMeta(GraphPTR ptr, int wt) : edge(ptr), weight(wt)
+    GraphMeta(GraphPTR ptr, GraphPTR input, int wt) : edge(ptr), weight(wt), inputs(input)
     {
     }
 
     GraphMeta(const GraphMeta &other) : weight(other.weight),
-                                        edge(other.edge)
+                                        edge(other.edge),
+                                        inputs(other.inputs)
     {
     }
 
     GraphMeta &operator=(const GraphMeta &other)
     {
+      //TODO : change Edge name
+      //Output
       weight = other.weight;
       edge = other.edge;
     }
 
     int weight;
     Graph::GraphPTR edge;
+    Graph::GraphPTR inputs;
   };
 
 private:
@@ -360,4 +365,60 @@ private:
   std::vector<GraphMeta> mEdges;
   std::vector<GraphPTR> mPath;
   int mID;
+};
+
+//Take Vector of two type
+// And return type based on
+template <typename T>
+class INodeOPS
+{
+public:
+  virtual ~INodeOPS();
+  virtual T eval() = 0;
+};
+
+template <typename T>
+class BinaryOps : public INodeOPS<T>
+{
+  INodeOPS<T> *rhs, lhs;
+  enum Type
+  {
+    ADD,
+    SUB
+  } type;
+
+public:
+  BinaryOps(Type typ) : type(typ)
+  {
+  }
+
+  void
+      T
+      eval()
+  {
+    if (type == ADD)
+    {
+      return lhs->eval() + rhs->eval();
+    }
+    else if (type == SUB)
+    {
+      return lhs->eval() - rhs->eval();
+    }
+  }
+};
+
+class Int32 : public INodeOPS<int>
+{
+public:
+  Int32(int data) : mData(data)
+  {
+  }
+
+  int32_t eval()
+  {
+    return mData;
+  }
+
+private:
+  int mData;
 };
