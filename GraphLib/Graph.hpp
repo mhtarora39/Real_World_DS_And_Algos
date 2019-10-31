@@ -367,7 +367,8 @@ private:
   int mID;
 };
 
-//Take Vector of two type
+
+// Take Vector of two type
 // And return type based on
 template <typename T>
 class INodeOPS
@@ -380,7 +381,7 @@ public:
 template <typename T>
 class BinaryOps : public INodeOPS<T>
 {
-  INodeOPS<T> *rhs, lhs;
+  std::shared_ptr< INodeOPS<T> > lhs,rhs;
   enum Type
   {
     ADD,
@@ -388,13 +389,15 @@ class BinaryOps : public INodeOPS<T>
   } type;
 
 public:
-  BinaryOps(Type typ) : type(typ)
+  BinaryOps(Type typ, std::shared_ptr< INodeOPS<T> >& lh,std::shared_ptr< INodeOPS<T> >& rh ) : type(typ) ,
+                                                                                                lhs(lh),
+                                                                                                rhs(rh) 
+  
   {
   }
 
-  void
-      T
-      eval()
+
+  T eval()
   {
     if (type == ADD)
     {
@@ -422,3 +425,80 @@ public:
 private:
   int mData;
 };
+
+class Float  : public INodeOPS<float>
+{
+public:
+  Float(float data) : mData(data)
+  {
+  }
+
+  float eval()
+  {
+    return mData;
+  }
+
+private:
+  float mData;
+};
+
+
+
+class Token
+{
+
+public:
+  enum EType { eInteger, ePlus, eMinus, eLparen, eRparen};
+  
+  Token(EType type,std::string text):m_type(type),m_text(text){
+  }
+
+private:
+  std::string m_text;
+  EType m_type; 
+
+};
+
+class GraphOpsBuilder {
+  
+public:  
+  GraphOpsBuilder(std::string& equation):m_equation(equation) {    
+  }
+
+   
+
+  
+private:
+
+  void lexi() {
+    for(auto ch : m_equation) {
+      switch(ch) {
+        case '(':
+          m_tokens.push_back(Token{Token::eLparen,ch})
+        break;
+        case ')':
+        break;
+        case '+':
+        break;
+        case '-':
+        break;
+        default:
+        if(ch > '9' || ch < '0') {
+          //throw
+        }
+
+
+
+      }  
+    }
+
+  }
+
+  std::string m_equation;   
+  std::vector<Token> m_tokens;
+};
+
+//(1+2)
+//Topological Sorting 
+//Dijkstra's 
+
