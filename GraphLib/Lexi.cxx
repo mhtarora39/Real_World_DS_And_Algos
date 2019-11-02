@@ -146,24 +146,51 @@ vector<Token> lex(const string& input)
   return result;
 }
 
+namespace b {
+  enum A {
+    a,b,c
+  };
+}
+
+int tmp () {
+  return b::a | b::b ;
+}
+
+const std::string t1 = "Mohit";
+const std::string t2 = " Arora ";
+const std::string& test1() {
+
+  return t1;
+}
+const std::string& test2() {
+  return t2;
+}
+
 int main()
 {
-  string input{ "(13-4)-(12+1+1)" }; // see if you can make nested braces work
-  auto tokens = lex(input);
+  b::A t;
+  auto  a = tmp();
+  const std::string a1="";
+  const std::string a2="";
+  std::cout << test1()+test2() <<std::endl;
 
-  // let's see the tokens
-  for (auto& t : tokens)
-    cout << t << "   ";
-  cout << endl;
 
-  try {
-    auto parsed = parse(tokens);
-    cout << input << " = " << parsed->eval() << endl;
-  } 
-  catch (const exception& e)
-  {
-    cout << e.what() << endl;
-  }
+  std::string input( "(13-4)-(12+1)" ); // see if you can make nested braces work
+  // auto tokens = lex(input);
+
+  // // let's see the tokens
+  // for (auto& t : tokens)
+  //   cout << t << "   ";
+  // cout << endl;
+
+  // try {
+  //   auto parsed = parse(tokens);
+  //   cout << input << " = " << parsed->eval() << endl;
+  // } 
+  // catch (const exception& e)
+  // {
+  //   cout << e.what() << endl;
+  // }
 
   getchar();
   return 0;

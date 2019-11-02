@@ -1,9 +1,11 @@
 
 #include <iostream>
+#include <sstream>
 #include <memory>
 #include <vector>
 #include <atomic>
 #include <map>
+#include <cctype>
 
 namespace AtomicOps
 {
@@ -378,32 +380,35 @@ public:
   virtual T eval() = 0;
 };
 
+enum class BinOps
+{
+    ADD,
+    SUB
+}
+
 template <typename T>
 class BinaryOps : public INodeOPS<T>
 {
   std::shared_ptr< INodeOPS<T> > lhs,rhs;
-  enum Type
-  {
-    ADD,
-    SUB
-  } type;
+  BinOps m_type;
 
 public:
-  BinaryOps(Type typ, std::shared_ptr< INodeOPS<T> >& lh,std::shared_ptr< INodeOPS<T> >& rh ) : type(typ) ,
-                                                                                                lhs(lh),
-                                                                                                rhs(rh) 
+  BinaryOps(BinOps typ, std::shared_ptr< INodeOPS<T> >& lh,std::shared_ptr< INodeOPS<T> >& rh ) : m_type(typ) ,
+                                                                                                  lhs(lh),
+                                                                                                  rhs(rh) 
   
   {
+
   }
 
 
   T eval()
   {
-    if (type == ADD)
+    if (m_type == BinOps::ADD)
     {
       return lhs->eval() + rhs->eval();
     }
-    else if (type == SUB)
+    else if (m_type == BinOps::SUB)
     {
       return lhs->eval() - rhs->eval();
     }
@@ -444,6 +449,7 @@ private:
 
 
 
+//changing naming convention
 class Token
 {
 
@@ -452,10 +458,10 @@ public:
   
   Token(EType type,std::string text):m_type(type),m_text(text){
   }
-
-private:
+//private:
   std::string m_text;
-  EType m_type; 
+  EType m_type;
+  
 
 };
 
@@ -463,36 +469,73 @@ class GraphOpsBuilder {
   
 public:  
   GraphOpsBuilder(std::string& equation):m_equation(equation) {    
+    lexi();
+    //Validate the equatiion
+    for(int i = 0; i < m_tokens.size(); i++) {
+      if(m_tokens[i].m_type == Token::eInteger) {
+         int lhs,rhs;
+         
+         ss << m_tokens[i].m_text;
+         ss >> lhs;
+         
+         ss << m_tokens[i+2].m_text;
+         ss >> rhs;
+         
+         auto type = m_tokens[i+1].m_type == Token::ePlus ? BinOps::ADD : BinOps::SUB; 
+
+         std::shared_ptr<INodeOPS<int>> binaryOps(new BinaryOps<int>(type,);
+      }  
+    }
+
+
+
   }
+    
 
    
 
   
 private:
 
+  
+  //m_tokens is not thread safe
   void lexi() {
-    for(auto ch : m_equation) {
-      switch(ch) {
+    for(int i = 0;i < m_equation.size(); i++) {
+
+      switch(m_equation[i]) {
         case '(':
-          m_tokens.push_back(Token{Token::eLparen,ch})
+          m_tokens.push_back(Token(Token::eLparen,"("));
         break;
         case ')':
+          m_tokens.push_back(Token(Token::eRparen, ")"));
         break;
         case '+':
+          m_tokens.push_back(Token(Token::ePlus, "+"));
         break;
         case '-':
+          m_tokens.push_back(Token(Token::eMinus, "-"));
         break;
         default:
-        if(ch > '9' || ch < '0') {
+        if(m_equation[i] > '9' || m_equation[i] < '0') {
           //throw
         }
+        else {
+          std::stringstream ss;
+          ss << m_equation[i];
+          for(int j = i+1;std::isdigit(m_equation[j]) ; j++ ) {
+            ss << m_equation[j];
+            i++;
+          }
 
-
+          m_tokens.push_back(Token(Token::eInteger,ss.str()));
+        }
 
       }  
     }
 
   }
+
+
 
   std::string m_equation;   
   std::vector<Token> m_tokens;

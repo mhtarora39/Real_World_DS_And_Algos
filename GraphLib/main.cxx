@@ -188,7 +188,7 @@ class A {
 int main()
 {
 
-  std::shared_ptr<A> a(new A());
+  std::shared_ptr<A> a = std::make_shared<A>();
   
   a.reset(new A());
 
