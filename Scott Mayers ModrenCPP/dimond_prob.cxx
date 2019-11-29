@@ -1,5 +1,5 @@
 #include<iostream>
-
+#include<vector>
 
 struct Base {
   Base() {
@@ -25,6 +25,38 @@ struct DerivedAB : DerivedA ,  DerivedB {
   }
 };
 
+//Array reserve
+
+int  function(int i) {
+  if(i == 0) {
+    throw "This is non std exception " ;
+  }
+  return 0;
+}
+
+int  function_1() {
+  try {
+    return function(0);
+  }
+  catch( ... ) {
+    return 100;
+  }
+  return 200;
+}
+
 int main() {
-  DerivedAB a;
+
+  auto i = function_1();
+  std::cout << i <<std::endl;
+  std::vector<int> a{1,2,3};
+  std::vector<int> b;
+  b.resize(a.size());
+  std::cout << b.size() <<std::endl;
+  for(int i = 0; i < a.size() ; i++) {
+    b[i] = a[i];
+  }
+   for(int i = 0; i < a.size() ; i++) { 
+   std::cout << b[i] <<" ----- " <<std::endl;
+   }
+  //DerivedAB a;
 }
