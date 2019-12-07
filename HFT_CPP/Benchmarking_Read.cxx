@@ -5,6 +5,9 @@
 #include <string>
 
 #include <benchmark/benchmark.h>
+//These are range arguments
+// This line is just defining range mltyply by
+// 2 start from 1024 to 2 Mb
 #define ARGS \
   ->RangeMultiplier(2)->Range(1024, 2 * 1024 * 1024)->UseRealTime()
 
@@ -25,6 +28,8 @@ template <class Word>
 void BM_Write_Sq(benchmark::State &state)
 {
   void *memory;
+  //Allocate allign memoru
+  //state.range_x() getting from ARGS preprocesser
   if (::posix_memalign(&memory, 64, state.range_x()) != 0)
     return;
   void *const end = static_cast<char *>(memory) + state.range_x();
@@ -32,6 +37,8 @@ void BM_Write_Sq(benchmark::State &state)
   memset(&fill, 0xab, sizeof(fill));
   Word *const start = static_cast<Word *>(memory);
   Word *const cend = static_cast<Word *>(end);
+  //Keep runnig until collect data
+  //we will see iteration count
   while (state.KeepRunning())
   {
     for (Word *p = start; p < cend; ++p)
