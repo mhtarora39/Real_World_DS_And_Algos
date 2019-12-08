@@ -9,7 +9,7 @@
 // This line is just defining range mltyply by
 // 2 start from 1024 to 2 Mb
 #define ARGS \
-  ->RangeMultiplier(2)->Range(1024, 2 * 1024 * 1024)->UseRealTime()
+  ->RangeMultiplier(2)->Range(4, 2 * 1024 * 1024 * 50)->UseRealTime()
 
 template <typename T>
 std::string get_type(T *)
@@ -72,7 +72,8 @@ void BM_read_Sq(benchmark::State &state)
   free(memory);
 }
 
-// undefined reference to `benchmark::Initialize(int*, char**)'
+// undefined reference to
+//`benchmark::Initialize(int*, char**)'
 
 BENCHMARK_TEMPLATE1(BM_Write_Sq, long)
 ARGS;
