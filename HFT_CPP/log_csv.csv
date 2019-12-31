@@ -1,0 +1,64 @@
+2019-12-08 11:13:20
+Running ./mybenchmark
+Run on (4 X 2900 MHz CPU s)
+CPU Caches:
+  L1 Data 32 KiB (x2)
+  L1 Instruction 32 KiB (x2)
+  L2 Unified 256 KiB (x2)
+  L3 Unified 3072 KiB (x1)
+Load Average: 2.10, 1.69, 1.60
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+***WARNING*** Library was built as DEBUG. Timings may be affected.
+name,iterations,real_time,cpu_time,time_unit,bytes_per_second,items_per_second,label,error_occurred,error_message
+"BM_Write_Sq<long>/4/real_time",107367506,6.26301,6.26094,ns,,,,,
+"BM_Write_Sq<long>/8/real_time",109137258,6.26691,6.26462,ns,,,,,
+"BM_Write_Sq<long>/16/real_time",77878857,8.78079,8.77783,ns,,,,,
+"BM_Write_Sq<long>/32/real_time",47972955,14.119,14.114,ns,,,,,
+"BM_Write_Sq<long>/64/real_time",27249298,25.539,25.5303,ns,,,,,
+"BM_Write_Sq<long>/128/real_time",13865393,48.9797,48.9588,ns,,,,,
+"BM_Write_Sq<long>/256/real_time",7165996,96.9848,96.9482,ns,,,,,
+"BM_Write_Sq<long>/512/real_time",3503250,199.217,199.15,ns,,,,,
+"BM_Write_Sq<long>/1024/real_time",1811859,401.991,401.84,ns,,,,,
+"BM_Write_Sq<long>/2048/real_time",882886,780.249,779.907,ns,,,,,
+"BM_Write_Sq<long>/4096/real_time",455441,1531.18,1530.59,ns,,,,,
+"BM_Write_Sq<long>/8192/real_time",228800,3049.97,3048.77,ns,,,,,
+"BM_Write_Sq<long>/16384/real_time",111600,6080.34,6077.95,ns,,,,,
+"BM_Write_Sq<long>/32768/real_time",57277,12124.2,12119.7,ns,,,,,
+"BM_Write_Sq<long>/65536/real_time",28638,24372.3,24363.2,ns,,,,,
+"BM_Write_Sq<long>/131072/real_time",13982,48839.8,48822.9,ns,,,,,
+"BM_Write_Sq<long>/262144/real_time",7062,97890.3,97855.7,ns,,,,,
+"BM_Write_Sq<long>/524288/real_time",3558,195723,195633,ns,,,,,
+"BM_Write_Sq<long>/1048576/real_time",1782,393294,393152,ns,,,,,
+"BM_Write_Sq<long>/2097152/real_time",850,786423,786137,ns,,,,,
+"BM_Write_Sq<long>/4194304/real_time",433,1.58537e+06,1.58486e+06,ns,,,,,
+"BM_Write_Sq<long>/8388608/real_time",216,3.19793e+06,3.19669e+06,ns,,,,,
+"BM_Write_Sq<long>/16777216/real_time",101,6.42609e+06,6.42397e+06,ns,,,,,
+"BM_Write_Sq<long>/33554432/real_time",50,1.31335e+07,1.3127e+07,ns,,,,,
+"BM_Write_Sq<long>/67108864/real_time",26,2.65366e+07,2.65268e+07,ns,,,,,
+"BM_Write_Sq<long>/104857600/real_time",16,4.38253e+07,4.37937e+07,ns,,,,,
+"BM_read_Sq<long>/4/real_time",120820001,5.82178,5.81543,ns,,,,,
+"BM_read_Sq<long>/8/real_time",112808439,6.28402,6.27778,ns,,,,,
+"BM_read_Sq<long>/16/real_time",81685362,8.056,8.04191,ns,,,,,
+"BM_read_Sq<long>/32/real_time",58938277,12.0879,12.0791,ns,,,,,
+"BM_read_Sq<long>/64/real_time",33100958,21.486,21.4733,ns,,,,,
+"BM_read_Sq<long>/128/real_time",17559193,40.124,40.1028,ns,,,,,
+"BM_read_Sq<long>/256/real_time",7712530,88.8918,88.8535,ns,,,,,
+"BM_read_Sq<long>/512/real_time",4217369,163.815,163.74,ns,,,,,
+"BM_read_Sq<long>/1024/real_time",2176128,310.23,310.141,ns,,,,,
+"BM_read_Sq<long>/2048/real_time",1143668,604.344,604.147,ns,,,,,
+"BM_read_Sq<long>/4096/real_time",583823,1189.23,1188.87,ns,,,,,
+"BM_read_Sq<long>/8192/real_time",294805,2367.43,2366.69,ns,,,,,
+"BM_read_Sq<long>/16384/real_time",148442,4770.42,4768.73,ns,,,,,
+"BM_read_Sq<long>/32768/real_time",73323,9478.25,9474.3,ns,,,,,
+"BM_read_Sq<long>/65536/real_time",36888,19323.9,19315,ns,,,,,
+"BM_read_Sq<long>/131072/real_time",17900,38019.7,38005.4,ns,,,,,
+"BM_read_Sq<long>/262144/real_time",9153,76347.3,76314.2,ns,,,,,
+"BM_read_Sq<long>/524288/real_time",4591,156993,156913,ns,,,,,
+"BM_read_Sq<long>/1048576/real_time",2236,314706,314516,ns,,,,,
+"BM_read_Sq<long>/2097152/real_time",1109,611220,611025,ns,,,,,
+"BM_read_Sq<long>/4194304/real_time",549,1.42048e+06,1.41438e+06,ns,,,,,
+"BM_read_Sq<long>/8388608/real_time",240,2.90002e+06,2.89256e+06,ns,,,,,
+"BM_read_Sq<long>/16777216/real_time",136,5.39836e+06,5.39262e+06,ns,,,,,
+"BM_read_Sq<long>/33554432/real_time",66,1.00383e+07,1.00323e+07,ns,,,,,
+"BM_read_Sq<long>/67108864/real_time",32,2.08348e+07,2.08079e+07,ns,,,,,
+"BM_read_Sq<long>/104857600/real_time",21,3.19767e+07,3.19527e+07,ns,,,,,
