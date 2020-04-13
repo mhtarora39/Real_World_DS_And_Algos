@@ -39,6 +39,20 @@
       "ratio": "cpp",
       "iomanip": "cpp",
       "mutex": "cpp",
-      "thread": "cpp"
+      "thread": "cpp",
+      "atomic": "cpp",
+      "cstdarg": "cpp",
+      "cstddef": "cpp",
+      "deque": "cpp",
+      "algorithm": "cpp",
+      "iterator": "cpp",
+      "map": "cpp",
+      "memory": "cpp",
+      "memory_resource": "cpp",
+      "numeric": "cpp",
+      "random": "cpp",
+      "set": "cpp",
+      "string": "cpp",
+      "cinttypes": "cpp"
     }
 }
