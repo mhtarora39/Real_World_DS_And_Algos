@@ -1,21 +1,21 @@
 /*
- * This file containt use for understanding c plus plus
- * 
+ * This file use for understanding c plus plus
+ *
  */
 
 
 
 #include<iostream>
 #include<vector>
-#include <typeinfo>
+#include <typeinfo> //use for typeid
 
 
-//Decltype 
+//Decltype
 
 
-//Type Deduction 
+//Type Deduction
 /*
-the specification for std::type_info::name mandates that the type be treated 
+the specification for std::type_info::name mandates that the type be treated
 as if it had been passed to a template function as a by-value parameter.
 */
 
@@ -28,7 +28,7 @@ void f(const T& ele) {
 
 
 int main() {
-  auto ele = std::vector<int>(2); 
+  auto ele = std::vector<int>(2);
   f(&ele);
   return 0;
 }
