@@ -1,7 +1,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
-
+// Calculate exponential
 int main() {
   int mode , base , expo;
   std::cout << " Enter Base : ";
