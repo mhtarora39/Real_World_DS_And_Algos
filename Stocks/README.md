@@ -1,0 +1,8 @@
+# Description
+
+Stock transaction requests arrive and are inserted at the head of a singly linked list. The transactions need to be carried out by K brokers, such that each transaction is independent of all others. K is a positive integer and is less than or equal to the length of the linked list. There are a total of N transaction requests in the linked list. The first \lfloor N/K \rfloor
+⌊N/K⌋ transactions need to be assigned to the first broker, the next \lfloor N/K \rfloor
+⌊N/K⌋ transactions to the second broker, and so on. In the end, some transactions (< N/K)(<N/K) may still be left in the original linked list. A first-come-first-serve policy will no be guaranteed globally, but the subset of transactions assigned to a specific broker will need to be carried out in the same order in which they arrived.
+<br>
+We do not want to split the original linked list. We will just pass a pointer to the transaction at the beginning of each K-node, set to different brokers. However, since this is a singly linked list and the order of the transactions in the linked list is opposite to the order in which they need to be processed, we will require each set of \lfloor N/K \rfloor ⌊N/K⌋ transactions in the linked list to be reversed. For this problem, we can assume that we are given a linked list of stock transaction requests, where an integer value represents each transaction request. We want to reverse the transactions in the list \lfloor N/K \rfloor
+⌊N/K⌋ at a time and return the modified list. We may not alter the values, and only the transaction, rather physically change the transactions in the linked list.
